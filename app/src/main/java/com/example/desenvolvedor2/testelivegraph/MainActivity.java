@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private LineChart lineChart;
     private int count=0;
-    private boolean isRunning;
+    private boolean isRunning=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,14 +41,16 @@ public class MainActivity extends AppCompatActivity  {
             public void onClick(View view) {
                 Snackbar.make(view, "Adding data", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                isRunning = !isRunning;
+                Log.d("FAB",isRunning+"");
                 feedMultiple();
             }
         });
 
         lineChart = (LineChart) findViewById(R.id.chart);
+        setGraphSettings();
         LineData lineData = new LineData();
         lineChart.setData(lineData);
-
 
     }
 
@@ -59,32 +61,25 @@ public class MainActivity extends AppCompatActivity  {
         return true;
     }
 
-    private void setGraph(LineDataSet dataSet){
-
-        dataSet.setCubicIntensity(50f);
-        dataSet.setColor(ContextCompat.getColor(this, R.color.colorAccent));
-        dataSet.setDrawCircles(false);
-
-        lineChart.animateY(3000);
-        lineChart.invalidate();
+    private void setGraphSettings(){
 
         Legend l = lineChart.getLegend();
 
         // modify the legend ...
         l.setForm(Legend.LegendForm.LINE);
 
-        l.setTextColor(Color.WHITE);
+        l.setTextColor(Color.BLACK);
 
         XAxis xl = lineChart.getXAxis();
 
-        xl.setTextColor(Color.WHITE);
-        xl.setDrawGridLines(false);
+        xl.setTextColor(Color.BLACK);
+        xl.setDrawGridLines(true);
         xl.setAvoidFirstLastClipping(true);
         xl.setEnabled(true);
 
         YAxis leftAxis = lineChart.getAxisLeft();
 
-        leftAxis.setTextColor(Color.WHITE);
+        leftAxis.setTextColor(Color.BLACK);
         leftAxis.setAxisMaxValue(100f);
         leftAxis.setAxisMinValue(0f);
         leftAxis.setDrawGridLines(true);
@@ -106,22 +101,13 @@ public class MainActivity extends AppCompatActivity  {
                 data.addDataSet(set);
             }
 
-            //data.addEntry(new Entry((float) (Math.random() * 40) + 30f,count), count);
-            data.addEntry(new Entry(set.getEntryCount(), (float) (Math.random() * 40) + 30f), 0);
+            data.addEntry(new Entry(set.getEntryCount(), (float) (1f + (Math.random() * 100f))), 0);
             data.notifyDataChanged();
-       //     count++;
-//            if(count > 10){
-//                set.removeFirst();
-//                Log.d("Teste","REMOVED");
-//                count--;
-//                data.notifyDataChanged();
-//            }
             Log.d("Teste","OK");
 
             lineChart.notifyDataSetChanged();
-            //lineChart.setVisibleXRangeMaximum(120);
+            lineChart.setVisibleXRangeMaximum(10);
             lineChart.moveViewToX(data.getEntryCount());
-            lineChart.setVisibleXRange(0f,10f);
 
         }
     }
@@ -131,21 +117,21 @@ public class MainActivity extends AppCompatActivity  {
         LineDataSet set = new LineDataSet(null, "Dynamic Data");
         set.setAxisDependency(YAxis.AxisDependency.LEFT);
         set.setColor(ColorTemplate.getHoloBlue());
-        set.setCircleColor(Color.WHITE);
+        //set.setCircleColor(Color.WHITE);
         set.setLineWidth(2f);
-        set.setCircleRadius(4f);
+        set.setDrawCircles(false);
         set.setFillAlpha(65);
         set.setFillColor(ColorTemplate.getHoloBlue());
         set.setHighLightColor(Color.rgb(244, 117, 117));
         set.setValueTextColor(Color.WHITE);
         set.setValueTextSize(9f);
         set.setDrawValues(false);
-        set.setCubicIntensity(1f);
+        set.setMode(LineDataSet.Mode.HORIZONTAL_BEZIER);
+        set.setCubicIntensity(0.05f);
         return set;
     }
 
     private void feedMultiple() {
-        isRunning=true;
         new Thread(new Runnable() {
             @Override
             public void run() {
